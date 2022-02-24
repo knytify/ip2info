@@ -11,9 +11,12 @@ https://github.com/ip2location/ip2location-python-c
 
 # Clone & ompile the C libraries
 
-## In windows
+## In windows (compile DLLs)
 
-Replace the contents of the Makefile.win of both projects, with these:
+Add this to all the function headers in the .h files of both projects (in the public functions)
+`__declspec(dllexport) `
+
+Then replace the contents of the Makefile.win of both projects, with these:
 
 ```
 TARGET_DLL = libIP2Proxy/IP2Proxy.dll
@@ -47,3 +50,7 @@ nmake /A /f Makefile.win
 
 cd C:\Users\bette\Desktop\knitify\projects\extern\IP2Location-python-c
 nmake /A /f Makefile.win
+
+## Python 3.9 compatibility
+
+In the standard CDLL module, line 364, add to the condition "name and" ("if name and (...)") after the "import nt", or it will not work.
