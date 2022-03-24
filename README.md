@@ -11,6 +11,18 @@ https://github.com/ip2location/ip2location-python-c
 
 # Clone & ompile the C libraries
 
+## Red Hat
+
+Install make and autoreconf, then
+```
+autoreconf -i -v --force
+./configure
+make
+make install
+```
+Then the libraries to use are in libIP2Proxy/.libs/libIP2Proxy.so.2.0.0" and /libIP2Location/.libs/libIP2Location.so.3.0.0"
+respectively
+
 ## In windows (compile DLLs)
 
 Add this to all the function headers in the .h files of both projects (in the public functions)
