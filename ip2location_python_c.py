@@ -83,7 +83,7 @@ class IP2Location(object):
         if sys.version < '3':
             self.ip2location_database_pointer = self.ip2location_c.IP2Location_open(filename)
         else:
-            self.ip2location_database_pointer = self.ip2location_c.IP2Location_open(bytes(filename, encoding='ascii'))
+            self.ip2location_database_pointer = self.ip2location_c.IP2Location_open(bytes(filename, encoding='utf-8'))
         self.ip2location_c.IP2Location_open_mem(self.ip2location_database_pointer, mode)
 
     def get_country_short(self, ip):
@@ -181,34 +181,34 @@ class IP2Location(object):
         # Need to set to the struct that created in the begining to get valid output instead of a pointer.
         self.ip2location_c.IP2Location_get_all.restype = POINTER(C_IP2LocationRecord) 
         self.rec = IP2LocationRecord()
-        self.result = self.ip2location_c.IP2Location_get_all(self.ip2location_database_pointer, ip)
-        # if sys.version < '3':
-        #     self.result = self.ip2location_c.IP2Location_get_all(self.ip2location_database_pointer, ip)
-        # else:
-        #     self.result = self.ip2location_c.IP2Location_get_all(self.ip2location_database_pointer, bytes(ip, encoding='utf-8'))
-        self.rec.country_short = self.result.contents.country_short
-        self.rec.country_long = self.result.contents.country_long
-        self.rec.region = self.result.contents.region
-        self.rec.city = self.result.contents.city
-        self.rec.isp = self.result.contents.isp
-        self.rec.latitude = self.result.contents.latitude
-        self.rec.longitude = self.result.contents.longitude
-        self.rec.domain = self.result.contents.domain
-        self.rec.zipcode = self.result.contents.zipcode
-        self.rec.timezone = self.result.contents.timezone
-        self.rec.netspeed = self.result.contents.netspeed
-        self.rec.idd_code = self.result.contents.idd_code
-        self.rec.area_code = self.result.contents.area_code
-        self.rec.weather_code = self.result.contents.weather_code
-        self.rec.weather_name = self.result.contents.weather_name
-        self.rec.mcc = self.result.contents.mcc
-        self.rec.mnc = self.result.contents.mnc
-        self.rec.mobile_brand = self.result.contents.mobile_brand
-        self.rec.elevation = self.result.contents.elevation
-        self.rec.usage_type = self.result.contents.usage_type
-        self.rec.address_type = self.result.contents.address_type
-        self.rec.category = self.result.contents.category
-        return self.rec
+        # self.result = self.ip2location_c.IP2Location_get_all(self.ip2location_database_pointer, ip)
+        if sys.version < '3':
+            self.result = self.ip2location_c.IP2Location_get_all(self.ip2location_database_pointer, ip)
+        else:
+            self.result = self.ip2location_c.IP2Location_get_all(self.ip2location_database_pointer, bytes(ip, encoding='utf-8'))
+        self.rec.country_short = self.result.contents.country_short.decode('utf-8')
+        self.rec.country_long = self.result.contents.country_long.decode('utf-8')
+        self.rec.region = self.result.contents.region.decode('utf-8')
+        self.rec.city = self.result.contents.city.decode('utf-8')
+        # self.rec.isp = self.result.contents.isp.decode('utf-8')
+        # self.rec.latitude = self.result.contents.latitude
+        # self.rec.longitude = self.result.contents.longitude
+        # self.rec.domain = self.result.contents.domain
+        # self.rec.zipcode = self.result.contents.zipcode
+        # self.rec.timezone = self.result.contents.timezone.decode('utf-8')
+        # self.rec.netspeed = self.result.contents.netspeed
+        # self.rec.idd_code = self.result.contents.idd_code
+        # self.rec.area_code = self.result.contents.area_code
+        # self.rec.weather_code = self.result.contents.weather_code
+        # self.rec.weather_name = self.result.contents.weather_name
+        # self.rec.mcc = self.result.contents.mcc
+        # self.rec.mnc = self.result.contents.mnc
+        # self.rec.mobile_brand = self.result.contents.mobile_brand
+        # self.rec.elevation = self.result.contents.elevation
+        # self.rec.usage_type = self.result.contents.usage_type
+        # self.rec.address_type = self.result.contents.address_type
+        # self.rec.category = self.result.contents.category
+        return self.rec.__dict__
 
     def close(self):
         '''

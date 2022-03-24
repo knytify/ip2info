@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 from ctypes import *
 from ctypes.util import find_library
 
@@ -46,7 +47,10 @@ class IP2Proxy(object):
         ''' Opens a database file '''
         self.ip2proxy_c.IP2Proxy_open.argtypes = [c_char_p]
         self.ip2proxy_c.IP2Proxy_open.restype = c_void_p
-        self.ip2proxy_c_pointer = self.ip2proxy_c.IP2Proxy_open(filename)
+        if sys.version < '3':
+            self.ip2proxy_c_pointer = self.ip2proxy_c.IP2Proxy_open(filename)
+        else:
+            self.ip2proxy_c_pointer = self.ip2proxy_c.IP2Proxy_open(bytes(filename, encoding='utf-8'))
 
     def get_module_version(self):
         return _VERSION
@@ -68,21 +72,25 @@ class IP2Proxy(object):
         ''' set the argument and response types of the function for data compatibility issue. '''
         self.ip2proxy_c.IP2Proxy_get_all.argtypes = [c_void_p, c_char_p]
         self.ip2proxy_c.IP2Proxy_get_all.restype = POINTER(C_IP2ProxyRecord)
-        self.rec = self.ip2proxy_c.IP2Proxy_get_all(self.ip2proxy_c_pointer, ip)
+
+        if sys.version < '3':
+            self.rec = self.ip2proxy_c.IP2Proxy_get_all(self.ip2proxy_c_pointer, ip)
+        else:
+            self.rec = self.ip2proxy_c.IP2Proxy_get_all(self.ip2proxy_c_pointer, bytes(ip, encoding='utf-8'))
 
         try:
-            country_short = self.rec.contents.country_short
-            country_long = self.rec.contents.country_long
-            region = self.rec.contents.region
-            city = self.rec.contents.city
-            isp = self.rec.contents.isp
-            proxy_type = self.rec.contents.proxy_type
-            is_proxy = self.rec.contents.is_proxy
-            domain = self.rec.contents.domain
-            usage_type = self.rec.contents.usage_type
-            asn = self.rec.contents.asn
-            as_name = self.rec.contents.as_
-            last_seen = self.rec.contents.last_seen
+            country_short = self.rec.contents.country_short.decode('utf-8')
+            country_long = self.rec.contents.country_long.decode('utf-8')
+            region = self.rec.contents.region.decode('utf-8')
+            city = self.rec.contents.city.decode('utf-8')
+            isp = None#self.rec.contents.isp
+            proxy_type = self.rec.contents.proxy_type.decode('utf-8')
+            is_proxy = self.rec.contents.is_proxy.decode('utf-8')
+            domain = None#self.rec.contents.domain
+            usage_type = None#self.rec.contents.usage_type
+            asn = None#self.rec.contents.asn
+            as_name = None#self.rec.contents.as_
+            last_seen = None#self.rec.contents.last_seen
         except:
             country_short = _INVALID_IP_ADDRESS
             country_long = _INVALID_IP_ADDRESS
@@ -98,18 +106,18 @@ class IP2Proxy(object):
             is_proxy = -1
 
         results = {}
-        results['is_proxy'] = is_proxy
+        results['is_proxy'] = int(is_proxy)
         results['proxy_type'] = proxy_type
         results['country_short'] = country_short
         results['country_long'] = country_long
         results['region'] = region
         results['city'] = city
-        results['isp'] = isp
-        results['domain'] = domain
-        results['usage_type'] = usage_type
-        results['asn'] = asn
-        results['as_name'] = as_name
-        results['last_seen'] = last_seen
+        # results['isp'] = isp
+        # results['domain'] = domain
+        # results['usage_type'] = usage_type
+        # results['asn'] = asn
+        # results['as_name'] = as_name
+        # results['last_seen'] = last_seen
 
         return results
 
